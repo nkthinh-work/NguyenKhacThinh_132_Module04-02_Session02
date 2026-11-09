@@ -1,0 +1,18 @@
+# Java / Gradle
+.gradle/
+.gradle-dist/
+**/build/
+*.class
+*.jar
+*.log
+
+# Secrets and local state
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/
+
+# Exercise evidence: add real screenshots manually
+# (Do NOT ignore PNGs in homework/session_02, because screenshots must be committed.)

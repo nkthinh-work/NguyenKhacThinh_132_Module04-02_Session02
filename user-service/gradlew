@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Minimal Gradle launcher for Linux/WSL; avoids bundling an unverified binary JAR.
+set -eu
+DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+if command -v gradle >/dev/null 2>&1; then
+  exec gradle -p "$DIR" "$@"
+fi
+VERSION='8.14.3'
+CACHE_ROOT="${GRADLE_USER_HOME:-$HOME/.gradle}/quickbite-launcher"
+BIN="$CACHE_ROOT/gradle-$VERSION/bin/gradle"
+if [ ! -x "$BIN" ]; then
+  command -v curl >/dev/null 2>&1 || { echo 'Need curl (sudo apt install curl)' >&2; exit 1; }
+  command -v unzip >/dev/null 2>&1 || { echo 'Need unzip (sudo apt install unzip)' >&2; exit 1; }
+  mkdir -p "$CACHE_ROOT"
+  ZIP="$CACHE_ROOT/gradle-$VERSION-bin.zip"
+  printf 'Downloading Gradle %s (first run only)...\n' "$VERSION"
+  curl -fL --retry 2 --connect-timeout 20 -o "$ZIP" \
+    "https://services.gradle.org/distributions/gradle-$VERSION-bin.zip"
+  unzip -q -o "$ZIP" -d "$CACHE_ROOT"
+  rm -f "$ZIP"
+fi
+exec "$BIN" -p "$DIR" "$@"
